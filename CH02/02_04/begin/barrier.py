@@ -5,6 +5,7 @@ import threading
 
 bags_of_chips = 1 # start with one on the list
 pencil = threading.Lock()
+fist_bump = threading.Barrier(10)
 
 def cpu_work(work_units):
     x = 0
@@ -14,6 +15,7 @@ def cpu_work(work_units):
 def barron_shopper():
     global bags_of_chips
     cpu_work(1) # do a bit of work first
+    fist_bump.wait()
     with pencil:
         bags_of_chips *= 2
         print('Barron DOUBLED the bags of chips.')
@@ -24,6 +26,7 @@ def olivia_shopper():
     with pencil:
         bags_of_chips += 3
         print('Olivia ADDED 3 bags of chips.')
+    fist_bump.wait()
 
 if __name__ == '__main__':
     shoppers = []

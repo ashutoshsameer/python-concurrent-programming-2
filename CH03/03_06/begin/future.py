@@ -7,7 +7,7 @@ import time
 def how_many_vegetables():
     print('Olivia is counting vegetables...')
     time.sleep(3)
-    return 42
+    return 41
 
 if __name__ == '__main__':
     print('Barron asks Olivia how many veggies are in the pantry.')

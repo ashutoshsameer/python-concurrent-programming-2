@@ -16,7 +16,7 @@ def par_sum(lo, hi, pool=None):
             futures = par_sum(lo, hi, pool=executor)
             return sum(f.result() for f in as_completed(futures))
     else:
-        if hi - lo <= 100_000: # base case threshold
+        if hi - lo <= 200_000: # base case threshold
             return [pool.submit(sum, range(lo,hi))]
         else:
             mid = (hi + lo) // 2 # middle index for splitting

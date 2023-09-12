@@ -36,6 +36,36 @@ def par_matrix_multiply(A, B):
     """ ******************* """
     """ YOUR CODE GOES HERE """
     """ ******************* """
+    if num_rows_A * num_cols_B < 25_000:
+        return seq_matrix_multiply(A, B)
+    
+    num_workers = mp.cpu_count()
+    chunk_size = math.ceil(num_rows_A / num_workers)
+    C_1D = mp.RawArray('d', num_rows_A*num_cols_B)
+    workers = []
+    for w in range(num_workers):
+        row_start_C = min(w*chunk_size, num_rows_A)
+        row_end_C = min((w+1)*chunk_size, num_rows_A)
+        workers.append(mp.Process(target=_par_worker,
+                                  args=(A,B,C_1D,row_start_C,row_end_C)))
+    
+    for w in workers:
+        w.start()
+
+    for w in workers:
+        w.join()
+
+    C_2D = [[0] * num_cols_B for _ in range(num_rows_A)]
+    for i in range(num_rows_A):
+        for j in range(num_cols_B):
+            C_2D[i][j] = C_1D[i*num_cols_B+j]
+    return C_2D
+
+def _par_worker(A,B,C_1D,row_start_C,row_end_C):
+    for i in range(row_start_C, row_end_C):
+        for j in range(len(B[0])):
+            for k in range(len(A[0])):
+                C_1D[i*len(B[0])+j] += A[i][k] * B[k][j]
 
 if __name__ == '__main__':
     NUM_EVAL_RUNS = 1

@@ -29,10 +29,15 @@ def _download_image(image_number):
 """ parallel implementation of multiple image downloader
     returns total bytes from downloading all images in image_numbers list """
 def par_download_images(image_numbers):
-    pass
+    total_bytes = 0
     """ ******************* """
     """ YOUR CODE GOES HERE """
     """ ******************* """
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        futures = [pool.submit(_download_image, num) for num in image_numbers]
+        for f in concurrent.futures.as_completed(futures):
+            total_bytes += f.result()
+    return total_bytes
 
 if __name__ == '__main__':
     NUM_EVAL_RUNS = 1

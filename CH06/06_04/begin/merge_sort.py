@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ Solution: Sort an array of random integers with merge sort """
 
+import math
 import random
 import time
 import multiprocessing as mp
@@ -49,10 +50,25 @@ def merge(array, left, mid, right):
 
 """ parallel implementation of merge sort """
 def par_mergesort(array, *args):
-    pass
     """ ******************* """
     """ YOUR CODE GOES HERE """
     """ ******************* """
+    if not args: # first call
+        shared_array = mp.RawArray('i', array)
+        par_mergesort(shared_array, 0, len(array)-1, 0)
+        array[:] = shared_array # insert result into original array
+        return array
+    else:
+        left, right, depth = args
+        if (depth >= math.log(mp.cpu_count(), 2)):
+            seq_mergesort(array, left, right)
+        elif (left < right):
+            mid = (left + right) // 2
+            left_proc = mp.Process(target=par_mergesort, args=(array, left, mid, depth+1)) # new thread
+            left_proc.start()
+            par_mergesort(array, mid+1, right, depth+1) # current thread
+            left_proc.join() # wait for new thread
+            merge(array, left, mid, right)
 
 if __name__ == '__main__':
     NUM_EVAL_RUNS = 1
